@@ -25,10 +25,13 @@ class Messages extends StatelessWidget {
             final msgs = snapshot.data!;
             return ListView.builder(
               reverse: true,
-              itemBuilder: (ctx, i) => MessageBubble(
-                key: ValueKey(msgs[i].id),
-                message: msgs[i],
-                belongsToCurrentUser: currentUser?.id == msgs[i].userId,
+              itemBuilder: (ctx, i) => Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 8),
+                child: MessageBubble(
+                  key: ValueKey(msgs[i].id),
+                  message: msgs[i],
+                  belongsToCurrentUser: currentUser?.id == msgs[i].userId,
+                ),
               ),
               itemCount: msgs.length,
             );
