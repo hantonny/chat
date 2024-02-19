@@ -88,7 +88,10 @@ class _NewMessageState extends State<NewMessage> {
         ),
         IconButton(
             onPressed: _message.trim().isEmpty ? null : _sendMessage,
-            icon: const Icon(Icons.send))
+            icon: const Icon(
+              Icons.send,
+              color: Colors.grey,
+            ))
       ],
     );
   }

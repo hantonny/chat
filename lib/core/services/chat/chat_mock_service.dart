@@ -12,7 +12,7 @@ class ChatMockSerice implements ChatService {
     //       'Opções de Ajuda: \n\n 1 - Falar com Suporte\n 2 - Cancelar serviço\n 3 - Negociar Dividas\n\n No que posso de ajudar?',
     //   createdAt: DateTime.now(),
     //   userId: '1',
-    //   userName: 'Chat',
+    //   userName: 'Chat O',
     //   userImageURL: 'assets/images/avatar.png',
     // ),
   ];
