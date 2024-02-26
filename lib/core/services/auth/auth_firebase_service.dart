@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:chat/core/models/chat_user.dart';
 import 'package:chat/core/services/auth/auth.service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -27,11 +28,7 @@ class AuthFirebaseService implements AuthService {
 
   @override
   Future<void> signup(
-    String name,
-    String email,
-    String password,
-    File? image,
-  ) async {
+      String name, String email, String password, File? image) async {
     final auth = FirebaseAuth.instance;
     UserCredential credential = await auth.createUserWithEmailAndPassword(
       email: email,
@@ -42,11 +39,14 @@ class AuthFirebaseService implements AuthService {
 
     // 1. Upload da foto do usuário
     final imageName = '${credential.user!.uid}.jpg';
-    final imageURL = await _uploadUserImage(image, imageName);
+    final imageUrl = await _uploadUserImage(image, imageName);
 
     // 2. atualizar os atributos do usuário
-    credential.user?.updateDisplayName(name);
-    credential.user?.updatePhotoURL(imageURL);
+    await credential.user?.updateDisplayName(name);
+    await credential.user?.updatePhotoURL(imageUrl);
+
+    // 3. salvar usuário no banco de dados (opcional)
+    await _saveChatUser(_toChatUser(credential.user!, imageUrl));
   }
 
   @override
@@ -62,21 +62,59 @@ class AuthFirebaseService implements AuthService {
     FirebaseAuth.instance.signOut();
   }
 
-  Future<String?> _uploadUserImage(File? image, String imageName) async {
-    if (image == null) return null;
+  Future<String> _uploadUserImage(File? image, String imageName) async {
+    try {
+      // Access Firebase Storage instance
+      final FirebaseStorage storage =
+          FirebaseStorage.instanceFor(bucket: 'chat0-8942b.appspot.com');
 
-    final storage = FirebaseStorage.instance;
-    final imageRef = storage.ref().child('user_images').child(imageName);
-    await imageRef.putFile(image).whenComplete(() {});
-    return await imageRef.getDownloadURL();
+      // Create reference to the "user_images" folder (or your desired folder)
+      final storageRef = storage.ref().child('user_images');
+
+      // Generate unique filename using the last path component of imageName
+      final uniqueFilename = imageName.split('/').last;
+
+      // Create reference to the unique file path
+      final imageRef = storageRef.child(uniqueFilename);
+
+      // Upload image with robust error handling
+      final uploadTask = imageRef.putFile(image!);
+
+      // Monitor upload progress (optional)
+      final snapshot = await uploadTask
+          .asStream()
+          .firstWhere((event) => event.bytesTransferred == event.totalBytes);
+
+      // Retrieve download URL after successful upload
+      return await snapshot.ref.getDownloadURL();
+    } on FirebaseException catch (e) {
+      // Handle Firebase-specific errors
+      print('Firebase storage error: $e');
+      rethrow; // Rethrow to propagate the exception for further handling
+    } catch (e) {
+      // Handle other potential errors
+      print('Upload error: $e');
+      rethrow; // Rethrow to allow for proper error management
+    }
   }
 
-  static ChatUser _toChatUser(User user) {
+  Future<void> _saveChatUser(ChatUser user) async {
+    final store = FirebaseFirestore.instance;
+    final docRef = store.collection('users').doc(user.id);
+
+    return docRef.set({
+      'name': user.name,
+      'email': user.email,
+      'imageUrl': user.imageURL,
+    });
+  }
+
+  static ChatUser _toChatUser(User user, [String? imageUrl]) {
     return ChatUser(
       id: user.uid,
       name: user.displayName ?? user.email!.split('@')[0],
       email: user.email!,
-      imageURL: user.photoURL ?? 'assets/images/avatar.png',
+      imageURL: imageUrl ?? user.photoURL ?? 'assets/images/avatar.png',
     );
   }
 }

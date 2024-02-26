@@ -1,3 +1,5 @@
+// ignore_for_file: control_flow_in_finally
+
 import 'package:chat/components/auth_form.dart';
 import 'package:chat/core/models/auth_form_data.dart';
 import 'package:chat/core/services/auth/auth.service.dart';

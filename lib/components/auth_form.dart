@@ -7,7 +7,10 @@ import 'package:flutter/material.dart';
 class AuthForm extends StatefulWidget {
   final void Function(AuthFormData) onSubmit;
 
-  const AuthForm({super.key, required this.onSubmit});
+  const AuthForm({
+    super.key,
+    required this.onSubmit,
+  });
 
   @override
   State<AuthForm> createState() => _AuthFormState();
@@ -21,7 +24,7 @@ class _AuthFormState extends State<AuthForm> {
     _formData.image = image;
   }
 
-  void _showErrorMensage(String msg) {
+  void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
@@ -35,7 +38,7 @@ class _AuthFormState extends State<AuthForm> {
     if (!isValid) return;
 
     if (_formData.image == null && _formData.isSignup) {
-      return _showErrorMensage('Imagem não selecionada!');
+      return _showError('Imagem não selecionada!');
     }
 
     widget.onSubmit(_formData);
@@ -49,86 +52,77 @@ class _AuthFormState extends State<AuthForm> {
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: Column(children: [
-            if (_formData.isSignup)
-              UserImagePicker(
-                onImagePick: _handleImagePick,
-              ),
-            if (_formData.isSignup)
+          child: Column(
+            children: [
+              if (_formData.isSignup)
+                UserImagePicker(
+                  onImagePick: _handleImagePick,
+                ),
+              if (_formData.isSignup)
+                TextFormField(
+                  key: const ValueKey('name'),
+                  initialValue: _formData.name,
+                  onChanged: (name) => _formData.name = name,
+                  decoration: const InputDecoration(labelText: 'Nome'),
+                  validator: (localName) {
+                    final name = localName ?? '';
+                    if (name.trim().length < 5) {
+                      return 'Nome deve ter no mínimo 5 caracteres.';
+                    }
+                    return null;
+                  },
+                ),
               TextFormField(
-                key: const ValueKey('name'),
-                initialValue: _formData.name,
-                onChanged: (name) => _formData.name = name,
-                decoration: const InputDecoration(labelText: 'Nome'),
-                validator: (localName) {
-                  final name = localName ?? '';
-                  if (name.trim().length < 5) {
-                    return 'Nome deve ter no mínimo 5 caracteres';
+                key: const ValueKey('email'),
+                initialValue: _formData.email,
+                onChanged: (email) => _formData.email = email,
+                decoration: const InputDecoration(labelText: 'E-mail'),
+                validator: (localEmail) {
+                  final email = localEmail ?? '';
+                  if (!email.contains('@')) {
+                    return 'E-mail nformado não é válido.';
                   }
                   return null;
                 },
               ),
-            TextFormField(
-              key: const ValueKey('email'),
-              initialValue: _formData.email,
-              onChanged: (email) => _formData.email = email,
-              decoration: const InputDecoration(labelText: 'E-mail'),
-              validator: (localEmail) {
-                final email = localEmail ?? '';
-                if (!email.contains('@')) {
-                  return 'E-mail informado não é válido!';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              key: const ValueKey('password'),
-              initialValue: _formData.password,
-              onChanged: (password) => _formData.password = password,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Senha'),
-              validator: (localPassword) {
-                final password = localPassword ?? '';
-                if (password.length < 6) {
-                  return 'Senha deve ter no mínimo 6 caracteres';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            ElevatedButton(
-              onPressed: _submit,
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                shadowColor: MaterialStateProperty.all<Color>(Colors.blue),
+              TextFormField(
+                key: const ValueKey('password'),
+                initialValue: _formData.password,
+                onChanged: (password) => _formData.password = password,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Senha'),
+                validator: (localPassword) {
+                  final password = localPassword ?? '';
+                  if (password.length < 6) {
+                    return 'Nome deve ter no mínimo 6 caracteres.';
+                  }
+                  return null;
+                },
               ),
-              child: Text(
-                _formData.isLogin ? 'Entrar' : 'Cadastrar',
-                style: const TextStyle(color: Colors.white),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.blue)),
+                onPressed: _submit,
+                child: Text(
+                  _formData.isLogin ? 'Entrar' : 'Cadastrar',
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _formData.tooggleAuthMode();
-                });
-              },
-              style: ButtonStyle(
-                shadowColor: MaterialStateProperty.all<Color>(Colors.blue),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _formData.tooggleAuthMode();
+                  });
+                },
+                child: Text(
+                  _formData.isLogin
+                      ? 'Criar uma nova conta?'
+                      : 'Já possui conta?',
+                ),
               ),
-              child: Text(
-                _formData.isLogin
-                    ? 'Criar uma nova conta?'
-                    : 'Já possuí conta?',
-                style: const TextStyle(color: Colors.blue),
-              ),
-            )
-          ]),
+            ],
+          ),
         ),
       ),
     );
