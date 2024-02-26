@@ -5,12 +5,22 @@ import 'package:chat/pages/chat_page.dart';
 import 'package:chat/pages/loading_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'dart:io';
 
 class AuthOrAppPage extends StatelessWidget {
   const AuthOrAppPage({super.key});
 
   Future<void> init(BuildContext context) async {
-    await Firebase.initializeApp();
+    Platform.isAndroid
+        ? await Firebase.initializeApp(
+            options: const FirebaseOptions(
+              apiKey: 'AIzaSyCwMyGcxE2sTVszpkK4UU6tsGALieRTMc4',
+              appId: '1:522022005069:android:10a80c76924dae73876f04',
+              messagingSenderId: '522022005069',
+              projectId: 'chat0-8942b',
+            ),
+          )
+        : await Firebase.initializeApp();
   }
 
   @override

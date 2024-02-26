@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "527656722661",
-    "project_id": "chat0-edcd7",
-    "storage_bucket": "chat0-edcd7.appspot.com"
+    "project_number": "522022005069",
+    "project_id": "chat0-8942b",
+    "storage_bucket": "chat0-8942b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:527656722661:android:8d68af3688bfee2cc3b40c",
+        "mobilesdk_app_id": "1:522022005069:android:10a80c76924dae73876f04",
         "android_client_info": {
           "package_name": "br.hantonny.chat"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA59hYNxUemsgdnGXeqjrJ-XI3Pc0LnzmE"
+          "current_key": "AIzaSyCwMyGcxE2sTVszpkK4UU6tsGALieRTMc4"
         }
       ],
       "services": {
