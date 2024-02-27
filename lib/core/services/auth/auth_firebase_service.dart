@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:chat/core/models/chat_user.dart';
 import 'package:chat/core/services/auth/auth.service.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,7 +13,7 @@ class AuthFirebaseService implements AuthService {
   static final _userStream = Stream<ChatUser?>.multi((controller) async {
     final authChanges = FirebaseAuth.instance.authStateChanges();
     await for (final user in authChanges) {
-      _currentUser = user == null ? null : _toChatUser(user, '', '');
+      _currentUser = user == null ? null : _toChatUser(user);
       controller.add(_currentUser);
     }
   });
@@ -77,35 +78,35 @@ class AuthFirebaseService implements AuthService {
 
   Future<String> _uploadUserImage(File? image, String imageName) async {
     try {
-      // Access Firebase Storage instance
+      // Acessar instância do Firebase Storage
       final FirebaseStorage storage =
           FirebaseStorage.instanceFor(bucket: 'chat0-8942b.appspot.com');
 
-      // Create reference to the "user_images" folder (or your desired folder)
+      // Criar referência para a pasta "user_images" (ou a pasta desejada)
       final storageRef = storage.ref().child('user_images');
 
-      // Generate unique filename using the last path component of imageName
+      // Gerar nome de arquivo único usando o último componente do caminho de imageName
       final uniqueFilename = imageName.split('/').last;
 
-      // Create reference to the unique file path
+      // Criar referência para o caminho do arquivo único
       final imageRef = storageRef.child(uniqueFilename);
 
-      // Upload image with robust error handling
+      // Fazer upload da imagem com tratamento de erro robusto
       final uploadTask = imageRef.putFile(image!);
 
-      // Monitor upload progress (optional)
+      // Monitorar progresso do upload (opcional)
       final snapshot = await uploadTask
           .asStream()
           .firstWhere((event) => event.bytesTransferred == event.totalBytes);
 
-      // Retrieve download URL after successful upload
+      // Obter URL de download após upload bem-sucedido
       return await snapshot.ref.getDownloadURL();
     } on FirebaseException {
-      // Handle Firebase-specific errors
-      rethrow; // Rethrow to propagate the exception for further handling
+      // Tratar erros específicos do Firebase
+      rethrow; // Repassar a exceção para tratamento posterior
     } catch (e) {
-      // Handle other potential errors
-      rethrow; // Rethrow to allow for proper error management
+      // Tratar outros erros potenciais
+      rethrow; // Repassar a exceção para permitir gerenciamento adequado de erros
     }
   }
 
@@ -120,10 +121,10 @@ class AuthFirebaseService implements AuthService {
     });
   }
 
-  static ChatUser _toChatUser(User user, String? name, [String? imageUrl]) {
+  static ChatUser _toChatUser(User user, [String? name, String? imageUrl]) {
     return ChatUser(
       id: user.uid,
-      name: user.displayName ?? user.email!.split('@')[0],
+      name: name ?? user.displayName ?? user.email!.split('@')[0],
       email: user.email!,
       imageURL: imageUrl ?? user.photoURL ?? 'assets/images/avatar.png',
     );
