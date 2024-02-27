@@ -35,15 +35,18 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-            primaryColor: Colors.blue,
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.blue,
-              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+          primaryColor: Colors.blue,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.blue,
+            titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          iconButtonTheme: IconButtonThemeData(
+            style: ButtonStyle(
+              iconColor: MaterialStateProperty.all(Colors.white),
             ),
-            iconButtonTheme: IconButtonThemeData(
-                style: ButtonStyle(
-                    iconColor: MaterialStateProperty.all(Colors.white)))),
+          ),
+        ),
         home: const AuthOrAppPage(),
         debugShowCheckedModeBanner: false,
       ),
