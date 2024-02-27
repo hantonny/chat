@@ -1,11 +1,16 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:chat/core/models/chat_user.dart';
 import 'package:chat/core/services/auth/auth.service.dart';
+import 'package:chat/core/services/notification/chat_notification_service.dart';
 import 'package:chat/pages/auth_page.dart';
 import 'package:chat/pages/chat_page.dart';
 import 'package:chat/pages/loading_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:io';
+
+import 'package:provider/provider.dart';
 
 class AuthOrAppPage extends StatelessWidget {
   const AuthOrAppPage({super.key});
@@ -22,6 +27,10 @@ class AuthOrAppPage extends StatelessWidget {
             ),
           )
         : await Firebase.initializeApp();
+    await Provider.of<ChatNotificationService>(
+      context,
+      listen: false,
+    ).init();
   }
 
   @override
